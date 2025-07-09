@@ -7,6 +7,7 @@ import connectDB from './db/db.js';
 import userRoutes from './routes/userRoutes.js'; // example route
 import authRoutes from './routes/authRoutes.js';
 import eventRoutes from './routes/eventRoutes.js';
+import blogRoutes from "./routes/blogRoutes.js";
 
 
 
@@ -20,6 +21,7 @@ app.use(cors());
 app.use(express.json());
 app.use('/api/auth', authRoutes);
 app.use('/api/events', eventRoutes);
+app.use("/api/blogs", blogRoutes);
 app.use('/api/users', userRoutes); // example route path
 
 // Connect to MongoDB and start server
