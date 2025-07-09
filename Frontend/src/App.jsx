@@ -1,18 +1,29 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { useState } from 'react';
+import Sidebar from './components/Sidebar';
+import Footer from './components/Footer';
 import Home from './pages/Home';
-import Events from './pages/Events';
 import Signup from './pages/Signup';
 
-function App() {
+const App = () => {
+  const [isSignedUp, setIsSignedUp] = useState(false); // Track signup
+
   return (
-    <Router>
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/events" element={<Events />} />
-        <Route path="/signup" element={<Signup />} />
-      </Routes>
-    </Router>
+    <>
+      {isSignedUp ? (
+        // Show main app after signup
+        <div className="flex h-screen">
+          <Sidebar />
+          <div className="flex flex-col flex-1 ml-64 p-6 overflow-y-auto">
+            <Home />
+            <Footer />
+          </div>
+        </div>
+      ) : (
+        // Show signup first
+        <Signup onSignupSuccess={() => setIsSignedUp(true)} />
+      )}
+    </>
   );
-}
+};
 
 export default App;
