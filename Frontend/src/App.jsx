@@ -1,15 +1,15 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import Home from './pages/Home';
-import Events from './pages/Events';
 import Signup from './pages/Signup';
+import EventPage from './pages/EventPage';
+import Login from "./pages/Login"; 
 
 function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/events" element={<Events />} />
-        <Route path="/signup" element={<Signup />} />
+        <Route path="/" element={<Signup />} />
+        <Route path="/events" element={<EventPage />} />
+        <Route path="/login" element={<Login />} /> {/* ✅ Added route */}
       </Routes>
     </Router>
   );
