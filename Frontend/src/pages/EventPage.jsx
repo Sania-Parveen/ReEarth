@@ -1,39 +1,54 @@
-import React, { useState } from 'react';
+// File: EventPage.jsx
+import React, { useEffect, useState } from 'react';
 import EventCard from '../components/EventCard';
+import axios from 'axios';
 
 function EventPage() {
-  const [showForm, setShowForm] = useState(false);
   const [events, setEvents] = useState([]);
+  const [showForm, setShowForm] = useState(false);
   const [formData, setFormData] = useState({
     title: '',
     location: '',
-    dateTime: '',
+    date: '',
     wasteType: '',
-    target: '',
-    volunteers: ''
+    volunteersNeeded: '',
+    createdBy: '' // Fill with user ID if auth is added
   });
 
-  const handleCreate = () => {
-    setShowForm(!showForm);
+  const fetchEvents = async () => {
+    try {
+      const res = await axios.get('http://localhost:3001/api/events');
+      setEvents(res.data);
+    } catch (error) {
+      console.error('Error fetching events:', error);
+    }
   };
+
+  useEffect(() => {
+    fetchEvents();
+  }, []);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    const newEvent = { ...formData, volunteers: parseInt(formData.volunteers) || 0 };
-    setEvents([...events, newEvent]);
-    setFormData({ title: '', location: '', dateTime: '', wasteType: '', target: '', volunteers: '' });
-    setShowForm(false);
+    try {
+      const res = await axios.post('http://localhost:3001/api/events/create', formData);
+      setEvents([...events, res.data]);
+      setShowForm(false);
+      setFormData({ title: '', location: '', date: '', wasteType: '', volunteersNeeded: '', createdBy: '' });
+    } catch (error) {
+      console.error('Error creating event:', error);
+    }
   };
 
   return (
     <div className="p-6 min-h-screen bg-blue-50">
       <div className="flex justify-between items-center mb-6 max-w-4xl mx-auto">
         <h1 className="text-3xl font-extrabold text-blue-900">🌊 Beach Cleanup Events</h1>
-        <button onClick={handleCreate} className="bg-blue-600 text-white px-5 py-2 rounded-lg hover:bg-blue-700">
+        <button onClick={() => setShowForm(!showForm)} className="bg-blue-600 text-white px-5 py-2 rounded-lg hover:bg-blue-700">
           + Create
         </button>
       </div>
@@ -43,10 +58,9 @@ function EventPage() {
           <h2 className="text-xl font-semibold mb-4 text-gray-800">Create New Event</h2>
           <input name="title" value={formData.title} onChange={handleChange} className="w-full mb-3 p-2 border rounded" placeholder="Event Title" required />
           <input name="location" value={formData.location} onChange={handleChange} className="w-full mb-3 p-2 border rounded" placeholder="Location" required />
-          <input name="dateTime" value={formData.dateTime} onChange={handleChange} className="w-full mb-3 p-2 border rounded" placeholder="Date & Time" required />
+          <input name="date" type="datetime-local" value={formData.date} onChange={handleChange} className="w-full mb-3 p-2 border rounded" required />
           <input name="wasteType" value={formData.wasteType} onChange={handleChange} className="w-full mb-3 p-2 border rounded" placeholder="Waste Type (e.g., Plastic, Glass)" required />
-          <input name="target" value={formData.target} onChange={handleChange} className="w-full mb-3 p-2 border rounded" placeholder="Target (e.g., Clean 1km beach)" required />
-          <input name="volunteers" type="number" value={formData.volunteers} onChange={handleChange} className="w-full mb-3 p-2 border rounded" placeholder="Volunteers Attending" required />
+          <input name="volunteersNeeded" type="number" value={formData.volunteersNeeded} onChange={handleChange} className="w-full mb-3 p-2 border rounded" placeholder="Volunteers Needed" required />
           <button type="submit" className="bg-green-600 text-white px-5 py-2 rounded hover:bg-green-700">Save Event</button>
         </form>
       )}
