@@ -7,21 +7,21 @@ import EventPage from './pages/EventPage';
 import Login from "./pages/Login"; 
 
 const App = () => {
-  const [isSignedUp, setIsSignedUp] = useState(false); // Track signup
+  const [isSignedUp, setIsSignedUp] = useState(true); // Toggle signup/login screen
 
   return (
     <>
       {isSignedUp ? (
-        // Show main app after signup
         <div className="flex h-screen">
           <Sidebar />
-          <div className="flex flex-col flex-1 ml-64 p-6 overflow-y-auto">
+
+          {/* Main Content */}
+          <div className="flex flex-col flex-1 p-4 overflow-y-auto">
             <Home />
             <Footer />
           </div>
         </div>
       ) : (
-        // Show signup first
         <Signup onSignupSuccess={() => setIsSignedUp(true)} />
       )}
     </>
