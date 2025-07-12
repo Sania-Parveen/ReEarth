@@ -3,10 +3,10 @@ export const createBlog = async (req, res) => {
   try {
     if (!req.file) return res.status(400).json({ error: 'No image uploaded' });
 
-    const imageUrl = req.file.path; // this will be the Cloudinary URL
-    const { caption } = req.body;
+    const imageUrl = req.file.path; // Cloudinary image URL
+    const { caption, description, author } = req.body;
 
-    const blog = new Blog({ imageUrl, caption });
+    const blog = new Blog({ imageUrl, caption, description, author });
     await blog.save();
 
     res.status(201).json(blog);
@@ -15,6 +15,7 @@ export const createBlog = async (req, res) => {
     res.status(500).json({ error: "Failed to create blog post" });
   }
 };
+
 
 
 export const getAllBlogs = async (req, res) => {
