@@ -1,67 +1,98 @@
-// File: EventCard.jsx
-import React, { useState } from 'react';
-import axios from 'axios';
+import React from "react";
+import bgImage from "../assets/ec.jpg";
 
-function WasteLogger({ eventId, userId }) {
-  const [form, setForm] = useState({
-    blackKg: '',
-    greenKg: '',
-    blueKg: ''
-  });
+const EventCard = ({ event, currentUser, onJoin, onEdit, onDelete }) => {
+  const {
+    _id,
+    title,
+    location,
+    date,
+    time,
+    wasteType,
+    volunteersNeeded,
+    volunteersJoined = [],
+    createdBy,
+  } = event;
 
-  const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      await axios.post(`http://localhost:3001/api/events/${eventId}/waste`, {
-        ...form,
-        userId
-      });
-      alert("✅ Waste logged successfully!");
-      setForm({ blackKg: '', greenKg: '', blueKg: '' });
-    } catch (err) {
-      console.error("Error logging waste:", err);
-      alert("❌ Failed to log waste");
-    }
-  };
+  const joined = volunteersJoined.includes(currentUser);
+  const alreadyJoined = event.volunteersJoined.includes(currentUser);
 
   return (
-    <form onSubmit={handleSubmit} className="bg-gray-50 p-4 rounded shadow mt-4">
-      <h3 className="text-lg font-semibold mb-2">Log Waste Collected</h3>
-      <input type="number" name="blackKg" placeholder="Black bin (kg)" value={form.blackKg} onChange={handleChange} className="block w-full mb-2 p-2 border rounded" required />
-      <input type="number" name="greenKg" placeholder="Green bin (kg)" value={form.greenKg} onChange={handleChange} className="block w-full mb-2 p-2 border rounded" required />
-      <input type="number" name="blueKg" placeholder="Blue bin (kg)" value={form.blueKg} onChange={handleChange} className="block w-full mb-2 p-2 border rounded" required />
-      <button type="submit" className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">Submit</button>
-    </form>
-  );
-}
+    <div
+      className="w-[380px] h-[300px] rounded-lg shadow-lg p-6 bg-white/60 backdrop-blur-md text-black mr-4 flex flex-col justify-between"
+      style={{
+        backgroundImage: `url(${bgImage})`,
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+      }}
+    >
+      <h3 className="text-xl font-semibold mb-2">{title}</h3>
+      <p>
+        <strong>📍 Location:</strong> {location}
+      </p>
+      <p>
+        <strong>📅 Date:</strong> {new Date(date).toLocaleDateString()}
+      </p>
+      <p>
+        <strong>⏰ Time:</strong> {time}
+      </p>
+      <p>
+        <strong>🗑 Waste Type:</strong> {wasteType}
+      </p>
+      <p className="text-sm">
+        👥 {volunteersJoined.length} / {volunteersNeeded} joined
+      </p>
+      <div className="flex justify-between items-center mt-4">
+        <button
+          className="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded"
+          onClick={() => {
+            const mapUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+              location
+            )}`;
+            window.open(mapUrl, "_blank");
+          }}
+        >
+          Map
+        </button>
 
-function EventCard({ event }) {
-  return (
-    <div className="border-2 rounded-xl shadow-md p-4 bg-white w-full md:w-3/4 mx-auto my-6">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center">
-        <div className="space-y-1">
-          <h2 className="text-2xl font-bold text-blue-800">{event.title}</h2>
-          <p><strong>📍 Location:</strong> {event.location}</p>
-          <p><strong>⏰ Date & Time:</strong> {new Date(event.date).toLocaleString()}</p>
-          <p><strong>♻️ Waste Type:</strong> {event.wasteType}</p>
-          <p><strong>🎯 Volunteers Needed:</strong> {event.volunteersNeeded}</p>
-          <p><strong>🙋 Joined:</strong> {event.volunteersJoined?.length || 0}</p>
-        </div>
+        {/* Join or Joined */}
+        {!joined ? (
+          <button
+            disabled={alreadyJoined}
+            onClick={() => onJoin(event.eventId)}
+            className={`${
+              alreadyJoined
+                ? "bg-gray-400 cursor-not-allowed"
+                : "bg-green-600 hover:bg-green-700"
+            } text-white px-3 py-1 rounded`}
+          >
+            {alreadyJoined ? "✅ Joined" : "Join"}
+          </button>
+        ) : (
+          <span className="px-3 py-1 bg-green-700 text-white rounded-md">
+            Joined
+          </span>
+        )}
 
-        <div className="flex flex-col gap-2 mt-4 md:mt-0 md:ml-8">
-          <button className="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700">Join</button>
-          <button className="bg-gray-300 text-black px-4 py-2 rounded-md hover:bg-gray-400">Map</button>
-        </div>
+        {currentUser === createdBy && (
+          <>
+            <button
+              className="bg-green-600 hover:bg-green-500 text-white px-3 py-1 rounded"
+              onClick={() => onEdit()}
+            >
+              Edit
+            </button>
+            <button
+              className="bg-green-300 hover:bg-green-400 text-white px-3 py-1 rounded"
+              onClick={() => onDelete(_id)}
+            >
+              Delete
+            </button>
+          </>
+        )}
       </div>
-
-      {/* Waste Logging Form */}
-      <WasteLogger eventId={event.eventId} userId="662a1b235fe8a12c7c0c1234" />
     </div>
   );
-}
+};
 
 export default EventCard;

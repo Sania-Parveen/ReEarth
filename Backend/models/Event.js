@@ -1,28 +1,27 @@
 import mongoose from 'mongoose';
 
 const wasteRecordSchema = new mongoose.Schema({
-  userId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
-  },
-  blackKg: { type: Number, default: 0 },
-  greenKg: { type: Number, default: 0 },
-  blueKg: { type: Number, default: 0 },
-  timestamp: {
-    type: Date,
-    default: Date.now,
-  },
+  userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }, // ✅ Required for population
+  type: { type: String, enum: ['green', 'blue', 'black'], required: true },
+  kg: { type: Number, required: true },
 });
 
+
 const eventSchema = new mongoose.Schema({
-  title: String,
-  location: String,
-  date: Date,
+  title: { type: String, required: true },
+  location: { type: String, required: true },
+  date: { type: Date, required: true },
+  time: { type: String, required: true }, // ✅ Fixed here
   wasteType: String,
   volunteersNeeded: Number,
   volunteersJoined: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
+  joinedUsers: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
   createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
   eventId: { type: String, unique: true },
+  coordinates: {
+    lat: { type: Number },
+    lng: { type: Number }
+  },
   wasteTreated: {
     totalKg: { type: Number, default: 0 },
     records: [wasteRecordSchema],
@@ -30,4 +29,3 @@ const eventSchema = new mongoose.Schema({
 }, { timestamps: true });
 
 export default mongoose.model('Event', eventSchema);
-

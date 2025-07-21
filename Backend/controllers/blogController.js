@@ -74,6 +74,8 @@ export const getBlogById = async (req, res) => {
     res.status(500).json({ error: "Failed to fetch blog" });
   }
 };
+<<<<<<< HEAD
+=======
 
 // New: Delete Blog Post
 export const deleteBlog = async (req, res) => {
@@ -91,3 +93,4 @@ export const deleteBlog = async (req, res) => {
     res.status(500).json({ error: "Failed to delete blog post" });
   }
 };
+>>>>>>> 382cb6b52551438c2c61e3a14993c2956ded1fe8

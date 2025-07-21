@@ -23,4 +23,5 @@ router.get("/", getAllBlogs);
 router.get("/:id", getBlogById);
 router.delete("/:id", deleteBlog); // New: Delete route
 
+
 export default router;
