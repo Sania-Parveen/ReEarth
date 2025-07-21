@@ -36,4 +36,3 @@ export const getBlogById = async (req, res) => {
     res.status(500).json({ error: "Failed to fetch blog" });
   }
 };
-

@@ -9,6 +9,7 @@ router.post("/create", upload.single("image"), createBlog);
 router.get("/", getAllBlogs);
 router.get("/:id", getBlogById);
 
+
 export default router;
 //blogRoutes.js or wherever you define the POST route
 // const express = require('express');
