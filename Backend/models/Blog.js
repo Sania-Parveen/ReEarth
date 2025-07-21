@@ -5,9 +5,9 @@ const blogSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  caption: {
-    type: String,
-  },
+  caption: String,
+  description: String,
+  author: String,
   createdAt: {
     type: Date,
     default: Date.now,
@@ -16,4 +16,3 @@ const blogSchema = new mongoose.Schema({
 
 const Blog = mongoose.model("Blog", blogSchema);
 export default Blog;
-
