@@ -5,7 +5,7 @@ import {
   joinEvent,
   deleteEvent,
   updateEvent,
-} from "../api";
+} from "/api.js";
 import EventCard from "../components/EventCard";
 import CreateEventForm from "../components/CreateEventForm";
 import bgImage from "../assets/EventCard3.jpg";

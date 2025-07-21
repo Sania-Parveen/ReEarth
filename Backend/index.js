@@ -53,15 +53,8 @@ import authRoutes from './routes/authRoutes.js';
 import eventRoutes from './routes/eventRoutes.js';
 import blogRoutes from "./routes/blogRoutes.js";
 import geminiRoutes from "./routes/geminiRoutes.js";
-<<<<<<< HEAD
-
-=======
->>>>>>> c82d57fc22525ff6a17970b029c6dfedd867be1b
-
-
-
->>>>>>> 382cb6b52551438c2c61e3a14993c2956ded1fe8
-
+import notificationRoutes from './routes/notificationRoutes.js';
+import wasteRoutes from "./routes/wasteRoutes.js";
 dotenv.config();
 
 const app = express();
