@@ -9,7 +9,10 @@ import authRoutes from './routes/authRoutes.js';
 import eventRoutes from './routes/eventRoutes.js';
 import blogRoutes from "./routes/blogRoutes.js";
 import geminiRoutes from "./routes/geminiRoutes.js";
+<<<<<<< HEAD
 
+=======
+>>>>>>> c82d57fc22525ff6a17970b029c6dfedd867be1b
 
 
 
