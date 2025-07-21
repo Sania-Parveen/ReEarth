@@ -1,1 +1,22 @@
 @import "tailwindcss";
+
+
+
+
+
+
+.color-empty {
+  fill: #eeeeee;
+}
+.color-scale-1 {
+  fill: #a3d5a3;
+}
+.color-scale-2 {
+  fill: #66bb6a;
+}
+.color-scale-3 {
+  fill: #43a047;
+}
+.color-scale-4 {
+  fill: #2e7d32;
+}
