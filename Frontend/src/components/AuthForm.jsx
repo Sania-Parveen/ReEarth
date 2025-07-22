@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { API } from "../api";
+import { API } from "/api.js";
 
 const AuthForm = ({ onAuthSuccess }) => {
   const [isSignup, setIsSignup] = useState(false);

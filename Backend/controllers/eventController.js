@@ -3,6 +3,15 @@ import { nanoid } from 'nanoid';
 import fetch from 'node-fetch'; 
 import User from '../models/userModel.js';
 
+import { GoogleGenerativeAI } from "@google/generative-ai";
+import dotenv from "dotenv";
+
+dotenv.config();
+
+// Gemini setup
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+
 export const createEvent = async (req, res) => {
   try {
     const { title, location, date,time, wasteType, volunteersNeeded, createdBy } = req.body;
@@ -134,6 +143,109 @@ export const deleteEvent = async (req, res) => {
     res.json({ message: "Event deleted successfully" });
   } catch (error) {
     res.status(500).json({ message: "Failed to delete event", error });
+  }
+};
+
+// Get all past events (where event date < today)
+
+export const getPastEvents = async (req, res) => {
+  try {
+    const now = new Date();
+    const pastEvents = await Event.find({ date: { $lt: now } });
+    res.json(pastEvents);
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to fetch past events' });
+  }
+};
+
+
+// export const generateEventReport = async (req, res) => {
+//   try {
+//     const { eventId } = req.params;
+
+//     const event = await Event.findOne({ eventId });
+//     if (!event) {
+//       return res.status(404).json({ error: "Event not found" });
+//     }
+
+// const prompt = `
+// Generate a fun, engaging, and detailed event report for an environmental event with the following details:
+
+// Title: ${event.title}
+// Location: ${event.location}
+// Date: ${event.date}
+// Time: ${event.time}
+// Type of Waste Targeted: ${event.wasteType}
+// Target Volunteers: ${event.targetVolunteers}
+// Volunteers Joined: ${(event.joinedVolunteers || []).length}
+
+
+// Waste Treated (in kg):
+// ${wasteData.map(w => `- ${w.wasteType}: ${w.amount}`).join('\n')}
+
+// Add:
+// 1. A creative summary of the event's impact.
+// 2. A motivational closing line to encourage participation.
+// 3. Comment if the volunteer turnout was high, average, or low.
+// 4. Mention any standout facts based on the data (e.g., highest waste type treated).
+// Make the tone energetic and community-focused.
+// `;
+
+
+//     const result = await model.generateContent(prompt);
+//     const response = await result.response;
+//     const text = response.text();
+
+//     res.json({ report: text });
+//   } catch (error) {
+//     console.error("Report error:", error.message);
+//     res.status(500).json({ error: "Failed to generate event report" });
+//   }
+// };
+
+export const generateEventReport = async (req, res) => {
+  try {
+    const { eventId } = req.params;
+
+    const event = await Event.findOne({ eventId });
+    if (!event) {
+      return res.status(404).json({ error: "Event not found" });
+    }
+
+    const prompt = `
+Generate a fun, engaging, and detailed event report for an environmental event with the following details:
+
+Title: ${event.title}
+Location: ${event.location}
+Date: ${event.date}
+Time: ${event.time}
+Type of Waste Targeted: ${event.wasteType}
+Target Volunteers: ${event.targetVolunteers}
+Volunteers Joined: ${(event.joinedVolunteers || []).length}
+
+Waste Treated (in kg):
+${
+  event.wasteData && event.wasteData.length
+    ? event.wasteData.map(w => `- ${w.wasteType}: ${w.amount} kg`).join('\n')
+    : 'No waste data logged yet.'
+}
+
+Add:
+1. A creative summary of the event's impact.
+2. A motivational closing line to encourage participation.
+3. Comment if the volunteer turnout was high, average, or low.
+4. Mention any standout facts based on the data (e.g., highest waste type treated).
+Make the tone energetic and community-focused.
+`;
+
+    const result = await model.generateContent(prompt);
+    const response = await result.response;
+    const text = response.text();
+
+    res.json({ report: text });
+  } catch (error) {
+    console.error("Report error:", error.message);
+    res.status(500).json({ error: "Failed to generate event report" });
   }
 };
 

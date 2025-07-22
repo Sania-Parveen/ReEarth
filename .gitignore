@@ -8,3 +8,5 @@ Backend/.env
 # Vite and build files
 dist/
 .vscode/
+// ML model
+waste-predictor/waste-tf-env/
