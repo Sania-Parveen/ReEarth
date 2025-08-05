@@ -3,7 +3,6 @@ import {
   createEvent,
   joinEvent,
   getEventById,
-  logWaste,
    getAllEvents,
    updateEvent,
    deleteEvent,
@@ -16,7 +15,7 @@ const router = express.Router();
 
 router.post('/create', createEvent);
 router.post('/:eventId/join', joinEvent);
-router.post('/:eventId/waste', logWaste);
+
 router.get('/past', getPastEvents);
 router.get('/', getAllEvents); 
 router.put("/:id", updateEvent);      // Edit event

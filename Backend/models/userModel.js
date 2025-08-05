@@ -1,5 +1,6 @@
 import mongoose from 'mongoose';
 
+
 const userSchema = new mongoose.Schema({
   name: {
     type: String,
@@ -14,7 +15,9 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  wasteLogs: [{ type: mongoose.Schema.Types.ObjectId, ref: 'WasteLog' }]
 });
+
 
 const User = mongoose.model('User', userSchema);
 export default User;

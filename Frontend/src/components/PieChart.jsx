@@ -1,39 +1,58 @@
 // src/components/PieChart.jsx
-// src/components/PieChart.jsx
-import { PieChart, Pie, Cell, Tooltip, Legend } from "recharts";
+import {
+  PieChart,
+  Pie,
+  Cell,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+} from "recharts";
 
-const data = [
-  { name: "Plastic", value: 45 },
-  { name: "Organic", value: 25 },
-  { name: "Metal", value: 15 },
-  { name: "E-Waste", value: 10 },
-  { name: "Other", value: 5 },
-];
+const WasteDonutChart = ({ pieData }) => {
+  // Fallback if no pieData or it's not an array
+  const data = Array.isArray(pieData) && pieData.length > 0
+    ? pieData.map((item) => ({
+        name: item.name || "Unknown",
+        value: Number(item.value) || 0,
+        color: item.color || "#999999",
+      }))
+    : [
+        { name: "Black Waste", value: 20, color: "#000000" },
+        { name: "Green Waste", value: 30, color: "#22c55e" },
+        { name: "Blue Waste", value: 50, color: "#3b82f6" },
+      ];
 
-const COLORS = ["#8884d8", "#82ca9d", "#ffc658", "#ff8042", "#d0ed57"];
-
-const CustomPieChart = () => {
   return (
-    <div className="bg-white p-6 rounded-2xl shadow-lg">
-      <h2 className="text-xl font-bold mb-4">Waste Composition</h2>
-      <PieChart width={300} height={250}>
-        <Pie
-          data={data}
-          dataKey="value"
-          cx="50%"
-          cy="50%"
-          outerRadius={80}
-          label
-        >
-          {data.map((entry, index) => (
-            <Cell key={entry.name} fill={COLORS[index % COLORS.length]} />
-          ))}
-        </Pie>
-        <Tooltip />
-        <Legend />
-      </PieChart>
+    <div className="w-full h-[400px] bg-white rounded-2xl p-4 shadow-md flex flex-col">
+      <h2 className="text-xl font-semibold mb-4 text-center">Waste Distribution</h2>
+      <ResponsiveContainer width="100%" height="100%">
+        <PieChart margin={{ top: 20, right: 20, left: 20, bottom: 20 }}>
+          <Pie
+            data={data}
+            cx="50%"
+            cy="50%"
+            innerRadius={80}
+            outerRadius={120}
+            dataKey="value"
+            label={({ name, value }) => `${name} ${value}%`}
+            labelLine={false}
+          >
+            {data.map((entry, index) => (
+              <Cell key={`cell-${index}`} fill={entry.color} />
+            ))}
+          </Pie>
+          <Tooltip />
+          <Legend
+            verticalAlign="bottom"
+            layout="horizontal"
+            align="center"
+            iconType="circle"
+            wrapperStyle={{ paddingTop: "20px" }}
+          />
+        </PieChart>
+      </ResponsiveContainer>
     </div>
   );
 };
 
-export default CustomPieChart;
+export default WasteDonutChart;

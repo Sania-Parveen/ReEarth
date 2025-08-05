@@ -84,32 +84,7 @@ export const getEventById = async (req, res) => {
   }
 };
 
-// Log waste by classification
-export const logWaste = async (req, res) => {
-  try {
-    const { eventId } = req.params;
-    const { volunteerId, type, amount } = req.body;
 
-    const event = await Event.findById(eventId);
-    if (!event) return res.status(404).json({ message: 'Event not found' });
-
-    const user = await User.findById(volunteerId);
-    if (!user) return res.status(404).json({ message: 'User not found' });
-
-    event.wasteLogs.push({
-      volunteerId,
-      volunteerName: user.name, // 👈 Store volunteer name
-      type,
-      amount,
-    });
-
-    await event.save();
-
-    res.status(200).json({ message: 'Waste logged successfully' });
-  } catch (err) {
-    res.status(500).json({ error: 'Failed to log waste' });
-  }
-};
 
 export const getAllEvents = async (req, res) => {
   try {

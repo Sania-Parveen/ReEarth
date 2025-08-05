@@ -25,9 +25,27 @@ export const API = {
   GET_EVENTS: `${BASE_URL}/api/events`,
   GET_EVENT_BY_ID: (eventId) => `${BASE_URL}/api/events/${eventId}`,
   JOIN_EVENT: (eventId) => `${BASE_URL}/api/events/${eventId}/join`,
-  LOG_WASTE: (eventId) => `${BASE_URL}/api/events/${eventId}/waste`,
+  
+
   DELETE_EVENT: (eventId) => `${BASE_URL}/api/events/${eventId}`,
   UPDATE_EVENT: (eventId) => `${BASE_URL}/api/events/${eventId}`,
+
+  // --- Dashboard / Waste Analytics ---
+GET_TOTAL_WASTE: `${BASE_URL}/api/waste/total`,
+GET_WASTE_BY_TYPE: `${BASE_URL}/api/waste/by-type`,
+GET_WASTE_BY_EVENT: (eventId) => `${BASE_URL}/api/waste/event/${eventId}`,
+GET_WASTE_BY_USER: (userId) => `${BASE_URL}/api/waste/user/${userId}`,
+GET_WASTE_TRENDS: `${BASE_URL}/api/waste/trends`,
+GET_JOINED_EVENTS: (userId) => `${BASE_URL}/api/events/joined/${userId}`,
+//LOG_WASTE: (eventId) => `${BASE_URL}/api/events/${eventId}/waste`,
+// Add this line under Dashboard / Waste Analytics
+LOG_WASTE: `${BASE_URL}/api/waste/log`,
+GET_DASHBOARD_SUMMARY: (userId) => `${BASE_URL}/api/waste/dashboard/summary/${userId}`,
+
+
+
+
+
 
   // --- Gemini AI ---
   GENERATE_STORY: `${BASE_URL}/generate-story`,
@@ -50,12 +68,31 @@ export const createEvent = (eventData) => axios.post(API.CREATE_EVENT, eventData
 export const getEventById = (eventId) => axios.get(API.GET_EVENT_BY_ID(eventId));
 export const joinEvent = (eventId, userId) =>
   axios.post(API.JOIN_EVENT(eventId), { userId });
-export const logWaste = (eventId, data) =>
-  axios.post(API.LOG_WASTE(eventId), data);
+
 export const deleteEvent = (eventId) =>
   axios.delete(API.DELETE_EVENT(eventId));
 export const updateEvent = (eventId, updatedData) =>
   axios.put(API.UPDATE_EVENT(eventId), updatedData);
+
+
+// --- Dashboard / Waste Analytics ---
+export const getTotalWaste = () => axios.get(API.GET_TOTAL_WASTE);
+export const getWasteByType = () => axios.get(API.GET_WASTE_BY_TYPE);
+export const getWasteByEvent = (eventId) => axios.get(API.GET_WASTE_BY_EVENT(eventId));
+export const getWasteByUser = (userId) => axios.get(API.GET_WASTE_BY_USER(userId));
+export const getWasteTrends = () => axios.get(API.GET_WASTE_TRENDS);
+export const getJoinedEvents = (userId) =>
+  axios.get(API.GET_JOINED_EVENTS(userId));
+//export const logWaste = (eventId, data) =>
+//  axios.post(API.LOG_WASTE(eventId), data);
+export const logWaste = (data) => axios.post(API.LOG_WASTE, data);
+export const getDashboardSummary = (userId) =>
+  axios.get(API.GET_DASHBOARD_SUMMARY(userId));
+
+
+
+
+
 
 // --- Gemini Story ---
 export const generateStory = (data) => axios.post(API.GENERATE_STORY, data);
