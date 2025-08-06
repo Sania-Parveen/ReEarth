@@ -56,8 +56,8 @@ import geminiRoutes from "./routes/geminiRoutes.js";
 import notificationRoutes from './routes/notificationRoutes.js';
 import wasteRoutes from './routes/wasteRoutes.js';
 
-import notificationRoutes from './routes/notificationRoutes.js';
-import wasteRoutes from "./routes/wasteRoutes.js";
+
+
 dotenv.config();
 
 const app = express();

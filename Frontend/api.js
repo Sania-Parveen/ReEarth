@@ -60,12 +60,3 @@ export const updateEvent = (eventId, updatedData) =>
 
 // --- Gemini Story ---
 export const generateStory = (data) => axios.post(API.GENERATE_STORY, data);
-
-// export const getNotifications = (userId) =>
-//   axios.get(${BASE_URL}/api/notifications/${userId});
-
-// export const markNotificationAsRead = (id) =>
-//   axios.patch(${BASE_URL}/api/notifications/read/${id});
-
-// export const deleteNotification = (id) =>
-//   axios.delete(${BASE_URL}/api/notifications/delete/${id})
