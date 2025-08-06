@@ -4,7 +4,7 @@ import CreateBlogPostForm from '../components/CreateBlogPostForm';
 import BlogPostCard from '../components/BlogPostCard';
 
 // Import all necessary API functions, including deleteBlog
-import { getBlogs, createBlog as createBlogPostApi, deleteBlog } from '../../api.js';
+import { getBlogs, createBlog as createBlogPostApi, deleteBlog } from "/api.js";
 
 const BlogPage = () => {
   const [blogPosts, setBlogPosts] = useState([]);

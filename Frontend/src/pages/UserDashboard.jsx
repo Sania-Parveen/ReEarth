@@ -5,7 +5,7 @@ import LineGraph from "../components/LineGraph";
 import WasteProgress from "../components/WasteProgress";
 import Heatmap from "../components/Heatmap";
 import WasteModal from "../components/WasteModal";
-import { logWaste, getDashboardSummary } from "../api";
+import { logWaste, getDashboardSummary } from "/api.js";
 
 const UserDashboard = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);

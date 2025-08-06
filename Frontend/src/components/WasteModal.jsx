@@ -1,7 +1,7 @@
 // src/components/WasteModal.jsx
 
 import React, { useState, useEffect } from "react";
-import { logWaste, getJoinedEvents } from "../api";
+import { logWaste, getJoinedEvents } from "/api.js";
 
 const WasteModal = ({ isOpen, onClose, userId, onAddWaste }) => {
   const [wasteData, setWasteData] = useState([{ type: "", kg: "" }]);
