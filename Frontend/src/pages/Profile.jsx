@@ -1,7 +1,9 @@
+import UserDashboard from "./UserDashboard";
+
 const Profile = () => {
   return (
-    <div className="text-green-800 text-2xl font-bold">
-      👤 Profile Page
+    <div className="p-4">
+      <UserDashboard />
     </div>
   );
 };

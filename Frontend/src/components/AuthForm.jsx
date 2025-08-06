@@ -28,7 +28,11 @@ const AuthForm = ({ onAuthSuccess }) => {
       const data = await res.json();
       if (res.ok) {
         localStorage.setItem("userId", data.userId);
+        localStorage.setItem("userName", data.user.name);
+     // ✅ Save user name too
         console.log("Saved userId:", data.userId);
+        console.log("Saved userName:", data.user.name);
+        
         onAuthSuccess(); // move to home/dashboard after login/signup
       } else {
         alert(data.error || "Authentication failed.");

@@ -9,6 +9,7 @@ import Footer from "./components/Footer";
 import Home from "./pages/Home";
 import EventReportPage from "./pages/EventReportPage";
 import EventPage from "./pages/EventPage";
+
 import ChatPage from "./pages/ChatPage";
 import RecyclingPartnersPage from "./pages/RecyclingPartnersPage";
 import Profile from "./pages/Profile";
@@ -53,12 +54,13 @@ const App = () => {
           <div className="flex flex-col flex-1 overflow-y-auto">
             <div className="flex-grow p-4">
               <Routes>
+                {/* <Route path="/intro" element={<IntroPage />} /> */}
                 <Route path="/" element={<Home />} />
                 <Route path="/events" element={<EventPage />} />
                 <Route path="/partners" element={<RecyclingPartnersPage />} />
                 <Route path="/chat" element={<ChatPage />} />
                 <Route path="/project" element={<Projects />} />
-                <Route path="/profile" element={<Profile />} />
+                <Route path="/profile" element={<UserDashboard />} />
                 <Route path="/about" element={<About />} />
                 <Route path="/blog" element={<BlogPage />} />
                 <Route path="/predict" element={<WastePredictor />} />

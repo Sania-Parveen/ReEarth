@@ -22,7 +22,8 @@ export const API = {
   GET_EVENTS: `${BASE_URL}/api/events`,
   GET_EVENT_BY_ID: (eventId) => `${BASE_URL}/api/events/${eventId}`,
   JOIN_EVENT: (eventId) => `${BASE_URL}/api/events/${eventId}/join`,
-  LOG_WASTE: (eventId) => `${BASE_URL}/api/events/${eventId}/waste`,
+  
+
   DELETE_EVENT: (eventId) => `${BASE_URL}/api/events/${eventId}`,
   UPDATE_EVENT: (eventId) => `${BASE_URL}/api/events/${eventId}`,
 
@@ -54,7 +55,8 @@ export const getBlogById = (id) => axios.get(API.GET_BLOG_BY_ID(id));
 export const getEvents = () => axios.get(API.GET_EVENTS);
 export const createEvent = (eventData) => axios.post(API.CREATE_EVENT, eventData);
 export const getEventById = (eventId) => axios.get(API.GET_EVENT_BY_ID(eventId));
-export const joinEvent = (eventId, userId) => axios.post(API.JOIN_EVENT(eventId), { userId });
+export const joinEvent = (eventId, userId) =>
+  axios.post(API.JOIN_EVENT(eventId), { userId });
 export const logWaste = (eventId, data) => axios.post(API.LOG_WASTE(eventId), data);
 export const deleteEvent = (eventId) => axios.delete(API.DELETE_EVENT(eventId));
 export const updateEvent = (eventId, updatedData) => axios.put(API.UPDATE_EVENT(eventId), updatedData);
