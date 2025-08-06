@@ -131,7 +131,7 @@ import blogBackground from '../assets/blogBackground.jpg'; // Import the backgro
 
 
 // Import all necessary API functions, including deleteBlog
-import { getBlogs, createBlog as createBlogPostApi, deleteBlog } from '../../api.js';
+import { getBlogs, createBlog as createBlogPostApi, deleteBlog } from "/api.js";
 
 const BlogPage = () => {
   const [blogPosts, setBlogPosts] = useState([]);

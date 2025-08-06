@@ -13,75 +13,79 @@ import { RiLeafFill } from "react-icons/ri";
 
 const Footer = () => {
   return (
-    <div className="mt-auto w-full">
-      <footer className="bg-green-100 text-green-900 py-4 shadow-inner rounded-t-2xl text-sm">
-  <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-start">
+    <footer className="bg-[#DFF6E4] text-[#045D39] py-6 mt-auto shadow-inner rounded-t-2xl text-sm">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 items-start">
 
-      {/* Brand & Mission */}
-      <div className="flex flex-col items-center md:items-start text-center md:text-left">
-        <div className="flex items-center mb-2">
-          <RiLeafFill className="text-2xl text-green-600 mr-2" />
-          <h2 className="text-2xl font-semibold text-green-800">ReEarth</h2>
-        </div>
-        <p className="text-xs text-green-700 max-w-xs leading-relaxed">
-          Empowering communities to restore our planet through sustainable actions, one step at a time.
-        </p>
-      </div>
+          {/* Brand & Mission */}
+          <div>
+            <div className="flex items-center mb-3">
+              <RiLeafFill className="text-2xl text-[#049F60] mr-2" />
+              <h2 className="text-xl font-bold text-[#014425]">ReEarth</h2>
+            </div>
+            <p className="text-sm text-[#045D39] max-w-md leading-relaxed">
+              Empowering communities to restore our planet through sustainable actions, one step at a time.
+            </p>
+          </div>
 
-      {/* Quick Links */}
-      <div>
-        <h3 className="font-bold text-green-800 mb-2 border-b border-green-400 pb-1 inline-block">Quick Links</h3>
-        <ul className="space-y-1 mt-1 text-green-700">
-          {["Home", "About Us", "Our Projects", "Join Events", "Blog", "Partners"].map((item, idx) => (
-            <li key={idx}>
-              <a
-                href={`/${item.toLowerCase().replace(/\s+/g, "")}`}
-                className="hover:text-green-900 font-medium transition duration-200"
-              >
-                {item}
+          {/* Contact Information */}
+          <div>
+            <h3 className="font-semibold text-[#014425] mb-2 text-base border-b border-[#aee4c5] pb-1">
+              Get in Touch
+            </h3>
+            <ul className="text-[#045D39] space-y-2">
+              <li className="flex items-start gap-2">
+                <FaMapMarkerAlt className="text-[#049F60] mt-0.5" />
+                <span>New Delhi, India</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <FaEnvelope className="text-[#049F60] mt-0.5" />
+                <span>support@reearth.org</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <FaPhoneAlt className="text-[#049F60] mt-0.5" />
+                <span>+91-9876543210</span>
+              </li>
+            </ul>
+          </div>
+
+          {/* Social Media Links */}
+          <div>
+            <h3 className="font-semibold text-[#014425] mb-2 text-base border-b border-[#aee4c5] pb-1">
+              Connect With Us
+            </h3>
+            <div className="flex gap-3 text-lg text-[#045D39]">
+              <a href="#" aria-label="Instagram" className="hover:text-[#012e1b] transition">
+                <FaInstagram />
               </a>
-            </li>
-          ))}
-        </ul>
-      </div>
+              <a href="#" aria-label="Twitter" className="hover:text-[#012e1b] transition">
+                <FaTwitter />
+              </a>
+              <a href="#" aria-label="LinkedIn" className="hover:text-[#012e1b] transition">
+                <FaLinkedin />
+              </a>
+              <a href="#" aria-label="Facebook" className="hover:text-[#012e1b] transition">
+                <FaFacebookF />
+              </a>
+              <a href="#" aria-label="YouTube" className="hover:text-[#012e1b] transition">
+                <FaYoutube />
+              </a>
+            </div>
+          </div>
+        </div>
 
-      {/* Contact & Social */}
-      <div>
-        <h3 className="font-bold text-green-800 mb-2 border-b border-green-400 pb-1 inline-block">Contact</h3>
-        <ul className="text-green-700 space-y-1 mb-3">
-          <li className="flex items-center gap-2">
-            <FaMapMarkerAlt className="text-green-600" />
-            <span>New Delhi, India</span>
-          </li>
-          <li className="flex items-center gap-2">
-            <FaEnvelope className="text-green-600" />
-            <span>support@reearth.org</span>
-          </li>
-          <li className="flex items-center gap-2">
-            <FaPhoneAlt className="text-green-600" />
-            <span>+91-9876543210</span>
-          </li>
-        </ul>
-        <div className="flex gap-3 text-lg text-green-700 justify-center md:justify-start">
-          <FaInstagram className="hover:text-green-900 transition" />
-          <FaTwitter className="hover:text-green-900 transition" />
-          <FaLinkedin className="hover:text-green-900 transition" />
-          <FaFacebookF className="hover:text-green-900 transition" />
-          <FaYoutube className="hover:text-green-900 transition" />
+        <hr className="my-4 border-[#b9e9cc]" />
+
+        {/* Footer Bottom */}
+        <div className="text-center text-[#045D39] text-xs sm:text-sm">
+          <p>&copy; {new Date().getFullYear()} ReEarth. All rights reserved.</p>
+          <p className="mt-0.5">
+            Developed by{" "}
+            <span className="font-semibold text-[#014425]">Sania Parveen, Sakshi, Sanjana</span>
+          </p>
         </div>
       </div>
-    </div>
-
-    <hr className="my-4 border-green-300" />
-
-    <p className="text-center text-xs text-green-700">
-      &copy; {new Date().getFullYear()} ReEarth. All rights reserved.
-    </p>
-  </div>
-</footer>
-
-    </div>
+    </footer>
   );
 };
 

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { getDashboardSummary } from "../api/api"; // Adjust path if needed
+import { getDashboardSummary } from "/api.js"; // Adjust path if needed
 
 const Dashboard = () => {
   const [summary, setSummary] = useState(null);
