@@ -36,8 +36,19 @@ export const markAsRead = async (req, res) => {
 // Send notifications to volunteers on the day of event
 export const sendEventDayNotifications = async () => {
   try {
-    const today = new Date().toISOString().split('T')[0]; // 'YYYY-MM-DD'
-    const eventsToday = await Event.find({ date: today });
+  const startOfDay = new Date();
+startOfDay.setHours(0, 0, 0, 0); // 00:00:00
+
+const endOfDay = new Date();
+endOfDay.setHours(23, 59, 59, 999); // 23:59:59
+
+const eventsToday = await Event.find({
+  date: {
+    $gte: startOfDay,
+    $lte: endOfDay,
+  },
+});
+
 
     for (const event of eventsToday) {
       for (const volunteerId of event.volunteersJoined) {

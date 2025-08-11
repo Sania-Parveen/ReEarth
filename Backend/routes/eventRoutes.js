@@ -15,7 +15,6 @@ const router = express.Router();
 
 router.post('/create', createEvent);
 router.post('/:eventId/join', joinEvent);
-
 router.get('/past', getPastEvents);
 router.get('/', getAllEvents); 
 router.put("/:id", updateEvent);      // Edit event
