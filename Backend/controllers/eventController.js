@@ -1,6 +1,6 @@
 import Event from '../models/Event.js';
 import { nanoid } from 'nanoid';
-import fetch from 'node-fetch';
+import fetch from 'node-fetch'; 
 import User from '../models/userModel.js';
 
 import { GoogleGenerativeAI } from "@google/generative-ai";
@@ -12,12 +12,11 @@ dotenv.config();
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
-// Create Event
 export const createEvent = async (req, res) => {
   try {
-    const { title, location, date, time, wasteType, volunteersNeeded, createdBy } = req.body;
+    const { title, location, date,time, wasteType, volunteersNeeded, createdBy,description } = req.body;
 
-    // Geocode location to get lat/lng
+    // Geocode the location to get lat/lng
     const geoRes = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(location)}`);
     const geoData = await geoRes.json();
 
@@ -30,6 +29,7 @@ export const createEvent = async (req, res) => {
 
     const event = new Event({
       title,
+      description,
       location,
       date,
       time,
@@ -52,13 +52,13 @@ export const createEvent = async (req, res) => {
   }
 };
 
-// Join Event
 export const joinEvent = async (req, res) => {
   const { eventId } = req.params;
   const { userId } = req.body;
 
   try {
     const event = await Event.findOne({ eventId });
+
 
     if (!event) return res.status(404).json({ error: 'Event not found' });
     if (event.volunteersJoined.includes(userId))
@@ -69,12 +69,12 @@ export const joinEvent = async (req, res) => {
 
     res.json({ message: 'Joined successfully', volunteersJoined: event.volunteersJoined.length });
   } catch (err) {
-    console.error("Join Error:", err);
+    console.error("Join Error:", err); // Add this to see exact error in terminal
     res.status(500).json({ error: 'Failed to join event' });
   }
 };
 
-// Get Event By ID
+
 export const getEventById = async (req, res) => {
   try {
     const event = await Event.findOne({ eventId: req.params.eventId }).populate('volunteersJoined');
@@ -85,40 +85,62 @@ export const getEventById = async (req, res) => {
   }
 };
 
-// Log Waste (Fixed version)
+// Log waste by classification
 export const logWaste = async (req, res) => {
   try {
     const { eventId } = req.params;
     const { volunteerId, type, amount } = req.body;
 
-    const event = await Event.findById(eventId);
+    const event = await Event.findOne({ eventId }); // assuming eventId is the custom ID
     if (!event) return res.status(404).json({ message: 'Event not found' });
 
     const user = await User.findById(volunteerId);
     if (!user) return res.status(404).json({ message: 'User not found' });
 
-    if (!event.wasteTreated) {
-      event.wasteTreated = { totalKg: 0, records: [] };
-    }
-
+    // Push new waste record
     event.wasteTreated.records.push({
-      userId: volunteerId,
-      type,
-      kg: amount,
-    });
+  userId: volunteerId,
+  type,
+  kg: amount, // assuming 'amount' means kilograms
+});
+event.wasteTreated.totalKg += amount; // Optionally update the total
 
-    event.wasteTreated.totalKg = (event.wasteTreated.totalKg || 0) + amount;
 
-    await event.save();
+  await event.save();
 
     res.status(200).json({ message: 'Waste logged successfully' });
   } catch (err) {
-    console.error("Error logging waste:", err);
+    console.error(err);
     res.status(500).json({ error: 'Failed to log waste' });
   }
 };
 
-// Get All Events
+// export const logWaste = async (req, res) => {
+//   try {
+//     const { eventId } = req.params;
+//     const { volunteerId, type, amount } = req.body;
+
+//     const event = await Event.findById(eventId);
+//     if (!event) return res.status(404).json({ message: 'Event not found' });
+
+//     const user = await User.findById(volunteerId);
+//     if (!user) return res.status(404).json({ message: 'User not found' });
+
+//     event.wasteLogs.push({
+//       volunteerId,
+//       volunteerName: user.name, // 👈 Store volunteer name
+//       type,
+//       amount,
+//     });
+
+//     await event.save();
+
+//     res.status(200).json({ message: 'Waste logged successfully' });
+//   } catch (err) {
+//     res.status(500).json({ error: 'Failed to log waste' });
+//   }
+// };
+
 export const getAllEvents = async (req, res) => {
   try {
     const events = await Event.find();
@@ -128,7 +150,7 @@ export const getAllEvents = async (req, res) => {
   }
 };
 
-// Update Event
+// Update event
 export const updateEvent = async (req, res) => {
   try {
     const { id } = req.params;
@@ -142,7 +164,7 @@ export const updateEvent = async (req, res) => {
   }
 };
 
-// Delete Event
+// Delete event
 export const deleteEvent = async (req, res) => {
   try {
     const { id } = req.params;
@@ -154,80 +176,106 @@ export const deleteEvent = async (req, res) => {
   }
 };
 
-// Get Past Events
+// Get all past events (where event date < today)
+
 export const getPastEvents = async (req, res) => {
   try {
     const now = new Date();
-    const pastEvents = await Event.find({ date: { $lte: now } });
-    console.log(`Found ${pastEvents.length} past events.`);
+    const pastEvents = await Event.find({ date: { $lt: now } });
     res.json(pastEvents);
   } catch (err) {
-    console.error("Error fetching past events:", err.message);
     res.status(500).json({ error: 'Failed to fetch past events' });
   }
 };
 
-// Generate Event Report
+
+// export const generateEventReport = async (req, res) => {
+//   try {
+//     const { eventId } = req.params;
+
+//     const event = await Event.findOne({ eventId });
+//     if (!event) {
+//       return res.status(404).json({ error: "Event not found" });
+//     }
+
+// const prompt = `
+// Generate a fun, engaging, and detailed event report for an environmental event with the following details:
+
+// Title: ${event.title}
+// Location: ${event.location}
+// Date: ${event.date}
+// Time: ${event.time}
+// Type of Waste Targeted: ${event.wasteType}
+// Target Volunteers: ${event.targetVolunteers}
+// Volunteers Joined: ${(event.joinedVolunteers || []).length}
+
+
+// Waste Treated (in kg):
+// ${wasteData.map(w => `- ${w.wasteType}: ${w.amount}`).join('\n')}
+
+// Add:
+// 1. A creative summary of the event's impact.
+// 2. A motivational closing line to encourage participation.
+// 3. Comment if the volunteer turnout was high, average, or low.
+// 4. Mention any standout facts based on the data (e.g., highest waste type treated).
+// Make the tone energetic and community-focused.
+// `;
+
+
+//     const result = await model.generateContent(prompt);
+//     const response = await result.response;
+//     const text = response.text();
+
+//     res.json({ report: text });
+//   } catch (error) {
+//     console.error("Report error:", error.message);
+//     res.status(500).json({ error: "Failed to generate event report" });
+//   }
+// };
+
 export const generateEventReport = async (req, res) => {
   try {
     const { eventId } = req.params;
-    console.log(`Received request to generate report for eventId: ${eventId}`);
 
     const event = await Event.findOne({ eventId });
     if (!event) {
-      console.error(`Error: Event with eventId ${eventId} not found.`);
       return res.status(404).json({ error: "Event not found" });
     }
-
-    const wasteData = (event.wasteTreated && event.wasteTreated.records)
-      ? event.wasteTreated.records
-      : [];
 
     const prompt = `
 Generate a fun, engaging, and detailed event report for an environmental event with the following details:
 
 Title: ${event.title}
 Location: ${event.location}
-Date: ${new Date(event.date).toLocaleDateString()}
+Date: ${event.date}
 Time: ${event.time}
 Type of Waste Targeted: ${event.wasteType}
-Target Volunteers: ${event.volunteersNeeded || 'N/A'}
-Volunteers Joined: ${(event.volunteersJoined || []).length}
-Total Waste Treated: ${event.wasteTreated ? event.wasteTreated.totalKg : 0} kg
+Target Volunteers: ${event.targetVolunteers}
+Volunteers Joined: ${(event.joinedVolunteers || []).length}
 
-Waste Treated by type (in kg):
+Waste Treated (in kg):
 ${
-  wasteData.length > 0
-    ? wasteData.map(w => `- ${w.type}: ${w.kg} kg`).join('\n')
+  event.wasteData && event.wasteData.length
+    ? event.wasteData.map(w => `- ${w.wasteType}: ${w.amount} kg`).join('\n')
     : 'No waste data logged yet.'
 }
 
 Add:
 1. A creative summary of the event's impact.
 2. A motivational closing line to encourage participation.
-3. Comment if the volunteer turnout was high, average, or low based on the target volunteers.
+3. Comment if the volunteer turnout was high, average, or low.
 4. Mention any standout facts based on the data (e.g., highest waste type treated).
 Make the tone energetic and community-focused.
 `;
 
-    console.log("Sending prompt to Gemini API...");
     const result = await model.generateContent(prompt);
     const response = await result.response;
     const text = response.text();
 
-    if (!text) {
-      console.error("Gemini API returned an empty or invalid response.");
-      return res.status(500).json({ error: "Failed to generate report from API." });
-    }
-
-    console.log("Report successfully generated.");
     res.json({ report: text });
   } catch (error) {
-    console.error("Report generation error:", error);
-    if (error.response) {
-      console.error("API error response status:", error.response.status);
-      console.error("API error response data:", error.response.data);
-    }
+    console.error("Report error:", error.message);
     res.status(500).json({ error: "Failed to generate event report" });
   }
 };
+

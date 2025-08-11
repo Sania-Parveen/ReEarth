@@ -8,7 +8,7 @@ import {
 } from "/api.js";
 import EventCard from "../components/EventCard";
 import CreateEventForm from "../components/CreateEventForm";
-import bgImage from "../assets/EventCard3.jpg";
+import bgImage from "../assets/image.png";
 
 function EventPage() {
   const [events, setEvents] = useState([]);
@@ -76,57 +76,8 @@ function EventPage() {
   }, []);
 
   return (
-    // <div className="p-4">
-    //   <div
-    //     className="min-h-screen bg-cover bg-center bg-no-repeat"
-    //     style={{ bgImage: "url('/your-background.png')" }}
-    //   >
-    //     <h2 className="text-2xl font-bold">🌱 Environmental Events</h2>
-    //     <button
-    //       className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
-    //       onClick={() => {
-    //         setShowForm(!showForm);
-    //         setEditEvent(null);
-    //       }}
-    //     >
-    //       + Create
-    //     </button>
-    //   </div>
-
-    //   {showForm && (
-    //     <CreateEventForm
-    //       onSubmit={handleCreate}
-    //       onCancel={() => setShowForm(false)}
-    //     />
-    //   )}
-
-    //   {editEvent && (
-    //     <CreateEventForm
-    //       initialData={editEvent}
-    //       onSubmit={(data) => handleUpdate(editEvent._id, data)}
-    //       onCancel={() => setEditEvent(null)}
-    //     />
-    //   )}
-
-    //   <div className="flex gap-4 overflow-x-auto py-4">
-    //     {events.map((event) => (
-    //       <EventCard
-    //         key={event.eventId}
-    //         event={event}
-    //         currentUser={currentUserId}
-    //         onJoin={handleJoin}
-    //         onDelete={handleDelete}
-    //         onEdit={() => {
-    //             setEditEvent(event);
-    //             setShowForm(false);
-    //           }}
-    //         />
-    //       ))}
-    //     </div>
-    //   </div>
-    // );
     <div
-      className="min-h-screen w-full bg-cover bg-center bg-no-repeat p-4"
+      className="min-h-screen w-full bg-cover bg-center bg-no-repeat p-0"
       style={{
         backgroundImage: `url(${bgImage})`,
         backgroundSize: "cover",
@@ -134,12 +85,15 @@ function EventPage() {
         backgroundRepeat: "no-repeat",
       }}
     >
-      {/* Overlay for readability */}
-      <div className="bg-white/60 backdrop-blur-sm p-4 rounded">
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-2xl font-bold">🌱 Environmental Events</h2>
+      {/* Glassy container */}
+      <div className="bg-white/60 backdrop-blur-md rounded-none p-0 shadow-none w-full">
+        {/* Header */}
+        <div className="flex justify-between items-center mb-6">
+          <h2 className="text-3xl font-extrabold text-gray-800">
+            🌱 Environmental Events
+          </h2>
           <button
-            className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
+            className="bg-green-600 text-white px-5 py-2 rounded-lg shadow hover:bg-green-700 transition"
             onClick={() => {
               setShowForm(!showForm);
               setEditEvent(null);
@@ -149,7 +103,7 @@ function EventPage() {
           </button>
         </div>
 
-        {/* Create or Edit Form */}
+        {/* Forms */}
         {showForm && (
           <CreateEventForm
             onSubmit={handleCreate}
@@ -164,8 +118,8 @@ function EventPage() {
           />
         )}
 
-        {/* Event Cards */}
-        <div className="flex gap-4 overflow-x-auto py-4">
+        {/* Scrollable Card Section */}
+        <div className="flex flex-col gap-6 px-2 sm:px-4 md:px-6">
           {events.map((event) => (
             <EventCard
               key={event.eventId}

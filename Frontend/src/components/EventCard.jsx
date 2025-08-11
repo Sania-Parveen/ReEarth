@@ -8,6 +8,7 @@ const EventCard = ({ event, currentUser, onJoin, onEdit, onDelete }) => {
     location,
     date,
     time,
+    description,
     wasteType,
     volunteersNeeded,
     volunteersJoined = [],
@@ -19,32 +20,44 @@ const EventCard = ({ event, currentUser, onJoin, onEdit, onDelete }) => {
 
   return (
     <div
-      className="w-[380px] h-[300px] rounded-lg shadow-lg p-6 bg-white/60 backdrop-blur-md text-black mr-4 flex flex-col justify-between"
+      className="w-full h-auto bg-gradient-to-br from-green-100 to-green-200 rounded-2xl shadow-lg p-6 flex flex-col justify-between"
       style={{
         backgroundImage: `url(${bgImage})`,
         backgroundSize: "cover",
         backgroundPosition: "center",
       }}
     >
-      <h3 className="text-xl font-semibold mb-2">{title}</h3>
-      <p>
-        <strong>📍 Location:</strong> {location}
-      </p>
-      <p>
-        <strong>📅 Date:</strong> {new Date(date).toLocaleDateString()}
-      </p>
-      <p>
-        <strong>⏰ Time:</strong> {time}
-      </p>
-      <p>
-        <strong>🗑 Waste Type:</strong> {wasteType}
-      </p>
-      <p className="text-sm">
-        👥 {volunteersJoined.length} / {volunteersNeeded} joined
-      </p>
-      <div className="flex justify-between items-center mt-4">
+      <div className="text-black">
+        <h3 className="text-xl font-bold mb-2 capitalize">{title}</h3>
+        {description && (
+          <p className="text-sm text-gray-700 mb-2 line-clamp-3">
+            {description}
+          </p>
+        )}
+        <p className="mb-1">
+          <span className="font-semibold">📍 Location:</span> {location}
+        </p>
+        <p className="mb-1">
+          <span className="font-semibold">📅 Date:</span>{" "}
+          {new Date(date).toLocaleDateString()}
+        </p>
+        <p className="mb-1">
+          <span className="font-semibold">⏰ Time:</span> {time}
+        </p>
+        <p className="mb-1">
+          <span className="font-semibold">🗑 Waste Type:</span> {wasteType}
+        </p>
+        <p className="mb-2">
+          <span className="font-semibold">👥</span> {volunteersJoined.length} /{" "}
+          {volunteersNeeded} joined
+        </p>
+      </div>
+
+      {/* Buttons */}
+      <div className="flex flex-wrap gap-2 mt-3">
+        {/* Map */}
         <button
-          className="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded"
+          className="bg-green-600 hover:bg-green-700 text-white px-4 py-1 rounded-md transition"
           onClick={() => {
             const mapUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
               location
@@ -55,35 +68,36 @@ const EventCard = ({ event, currentUser, onJoin, onEdit, onDelete }) => {
           Map
         </button>
 
-        {/* Join or Joined */}
+        {/* Join / Joined */}
         {!joined ? (
           <button
             disabled={alreadyJoined}
             onClick={() => onJoin(event.eventId)}
-            className={`${
+            className={`px-4 py-1 rounded-md text-white transition ${
               alreadyJoined
                 ? "bg-gray-400 cursor-not-allowed"
-                : "bg-green-600 hover:bg-green-700"
-            } text-white px-3 py-1 rounded`}
+                : "bg-emerald-600 hover:bg-emerald-700"
+            }`}
           >
             {alreadyJoined ? "✅ Joined" : "Join"}
           </button>
         ) : (
-          <span className="px-3 py-1 bg-green-700 text-white rounded-md">
+          <span className="px-4 py-1 bg-emerald-700 text-white rounded-md">
             Joined
           </span>
         )}
 
+        {/* Edit/Delete (creator only) */}
         {currentUser === createdBy && (
           <>
             <button
-              className="bg-green-600 hover:bg-green-500 text-white px-3 py-1 rounded"
+              className="bg-yellow-400 hover:bg-yellow-500 text-white px-4 py-1 rounded-md transition"
               onClick={() => onEdit()}
             >
               Edit
             </button>
             <button
-              className="bg-green-300 hover:bg-green-400 text-white px-3 py-1 rounded"
+              className="bg-red-500 hover:bg-red-600 text-white px-4 py-1 rounded-md transition"
               onClick={() => onDelete(_id)}
             >
               Delete

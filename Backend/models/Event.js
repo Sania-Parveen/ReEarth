@@ -9,6 +9,7 @@ const wasteRecordSchema = new mongoose.Schema({
 
 const eventSchema = new mongoose.Schema({
   title: { type: String, required: true },
+  description: { type: String },
   location: { type: String, required: true },
   date: { type: Date, required: true },
   time: { type: String, required: true }, // ✅ Fixed here

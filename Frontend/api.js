@@ -1,6 +1,3 @@
-// src/api.js
-
-// src/api.js
 
 import axios from "axios";
 
@@ -46,7 +43,8 @@ GET_JOINED_EVENTS: (userId) => `${BASE_URL}/api/events/joined/${userId}`,
 // Add this line under Dashboard / Waste Analytics
 
 GET_DASHBOARD_SUMMARY: (userId) => `${BASE_URL}/api/waste/dashboard/summary/${userId}`,
-LOG_WASTE: (eventId) => `${BASE_URL}/api/events/${eventId}/log-waste`, // ✅ add this
+LOG_WASTE: `${BASE_URL}/api/waste/log`, // ✅ static endpoint for logging waste
+
 
 
 
@@ -108,3 +106,11 @@ export const generateStory = (data) => axios.post(API.GENERATE_STORY, data);
 // --- Reports ---
 export const getPastEvents = () => axios.get(API.GET_PAST_EVENTS);
 export const generateEventReport = (eventId) => axios.get(API.GENERATE_EVENT_REPORT(eventId));
+
+export const getNotifications = (userId) =>
+  axios.get(`${API.BASE_URL}/api/notifications/${userId}`);
+export const markNotificationAsRead = (id) =>
+  axios.patch(`${API.BASE_URL}/api/notifications/read/${id}`);
+export const deleteNotification = (id) =>
+  axios.delete(`${API.BASE_URL}/api/notifications/delete/${id}`);
+

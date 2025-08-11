@@ -3,6 +3,7 @@ import StatCard from "../components/StatCard";
 import WasteDonutChart from "../components/PieChart";
 import LineGraph from "../components/LineGraph";
 import WasteProgress from "../components/WasteProgress";
+import BadgeSection from "../components/BadgeSection";
 import Heatmap from "../components/Heatmap";
 import WasteModal from "../components/WasteModal";
 import { logWaste, getDashboardSummary } from "/api.js";
@@ -13,7 +14,6 @@ const UserDashboard = () => {
   const [heatmapData, setHeatmapData] = useState([]);
   const userId = localStorage.getItem("userId");
   const userName = localStorage.getItem("userName") || "User";
-
 
   // 📌 Fetch dashboard summary
   useEffect(() => {
@@ -42,7 +42,10 @@ const UserDashboard = () => {
         const transformedHeatmap = Object.entries(res.data.dailyData || {}).map(
           ([date, wasteObj]) => ({
             date,
-            count: (wasteObj.blue || 0) + (wasteObj.green || 0) + (wasteObj.black || 0),
+            count:
+              (wasteObj.blue || 0) +
+              (wasteObj.green || 0) +
+              (wasteObj.black || 0),
           })
         );
 
@@ -57,41 +60,146 @@ const UserDashboard = () => {
   }, [userId]);
 
   // 📌 Log waste callback
+  // const handleWasteAdded = async (wasteData) => {
+  //   try {
+  //     const payload = { ...wasteData, userId };
+  //     await logWaste(payload);
+  //     setIsModalOpen(false);
+
+  //     const res = await getDashboardSummary(userId);
+
+  //     const pieChart = [
+  //       {
+  //         name: "Black Waste",
+  //         value: res.data.totalBlackKg,
+  //         color: "#000000",
+  //       },
+  //       {
+  //         name: "Green Waste",
+  //         value: res.data.totalGreenKg,
+  //         color: "#22c55e",
+  //       },
+  //       {
+  //         name: "Blue Waste",
+  //         value: res.data.totalBlueKg,
+  //         color: "#3b82f6",
+  //       },
+  //     ];
+
+  //     const transformedHeatmap = Object.entries(res.data.dailyData || {}).map(
+  //       ([date, wasteObj]) => ({
+  //         date,
+  //         count:
+  //           (wasteObj.blue || 0) +
+  //           (wasteObj.green || 0) +
+  //           (wasteObj.black || 0),
+  //       })
+  //     );
+
+  //     setSummary({ ...res.data, pieChart });
+  //     setHeatmapData(transformedHeatmap);
+  //   } catch (err) {
+  //     console.error("Error logging waste:", err);
+  //   }
+  // };
   const handleWasteAdded = async (wasteData) => {
     try {
       const payload = { ...wasteData, userId };
       await logWaste(payload);
       setIsModalOpen(false);
 
-      const res = await getDashboardSummary(userId);
+      // Optimistically update the state
+      setSummary((prev) => {
+        const updated = { ...prev };
 
-      const pieChart = [
-        {
-          name: "Black Waste",
-          value: res.data.totalBlackKg,
-          color: "#000000",
-        },
-        {
-          name: "Green Waste",
-          value: res.data.totalGreenKg,
-          color: "#22c55e",
-        },
-        {
-          name: "Blue Waste",
-          value: res.data.totalBlueKg,
-          color: "#3b82f6",
-        },
-      ];
+        if (payload.wasteType === "blue")
+          updated.totalBlueKg += payload.quantity;
+        if (payload.wasteType === "green")
+          updated.totalGreenKg += payload.quantity;
+        if (payload.wasteType === "black")
+          updated.totalBlackKg += payload.quantity;
 
-      const transformedHeatmap = Object.entries(res.data.dailyData || {}).map(
-        ([date, wasteObj]) => ({
-          date,
-          count: (wasteObj.blue || 0) + (wasteObj.green || 0) + (wasteObj.black || 0),
-        })
-      );
+        updated.pieChart = [
+          {
+            name: "Black Waste",
+            value: updated.totalBlackKg,
+            color: "#000000",
+          },
+          {
+            name: "Green Waste",
+            value: updated.totalGreenKg,
+            color: "#22c55e",
+          },
+          {
+            name: "Blue Waste",
+            value: updated.totalBlueKg,
+            color: "#3b82f6",
+          },
+        ];
 
-      setSummary({ ...res.data, pieChart });
-      setHeatmapData(transformedHeatmap);
+        const today = new Date().toISOString().split("T")[0];
+        if (!updated.dailyData) updated.dailyData = {};
+        if (!updated.dailyData[today]) {
+          updated.dailyData[today] = { blue: 0, green: 0, black: 0 };
+        }
+        updated.dailyData[today][payload.wasteType] += payload.quantity;
+
+        return updated;
+      });
+
+      setHeatmapData((prev) => {
+        const today = new Date().toISOString().split("T")[0];
+        const existing = prev.find((entry) => entry.date === today);
+        if (existing) {
+          return prev.map((entry) =>
+            entry.date === today
+              ? { ...entry, count: entry.count + payload.quantity }
+              : entry
+          );
+        } else {
+          return [...prev, { date: today, count: payload.quantity }];
+        }
+      });
+
+      // ✅ Delayed re-fetch to ensure full backend sync
+      setTimeout(async () => {
+        try {
+          const res = await getDashboardSummary(userId);
+
+          const pieChart = [
+            {
+              name: "Black Waste",
+              value: res.data.totalBlackKg,
+              color: "#000000",
+            },
+            {
+              name: "Green Waste",
+              value: res.data.totalGreenKg,
+              color: "#22c55e",
+            },
+            {
+              name: "Blue Waste",
+              value: res.data.totalBlueKg,
+              color: "#3b82f6",
+            },
+          ];
+
+          const transformedHeatmap = Object.entries(
+            res.data.dailyData || {}
+          ).map(([date, wasteObj]) => ({
+            date,
+            count:
+              (wasteObj.blue || 0) +
+              (wasteObj.green || 0) +
+              (wasteObj.black || 0),
+          }));
+
+          setSummary({ ...res.data, pieChart });
+          setHeatmapData(transformedHeatmap);
+        } catch (err) {
+          console.error("Failed to refetch dashboard summary:", err);
+        }
+      }, 2000);
     } catch (err) {
       console.error("Error logging waste:", err);
     }
@@ -130,7 +238,9 @@ const UserDashboard = () => {
           <StatCard
             type="total"
             title="Total Waste"
-            value={`${summary.totalBlueKg + summary.totalGreenKg + summary.totalBlackKg} kg`}
+            value={`${
+              summary.totalBlueKg + summary.totalGreenKg + summary.totalBlackKg
+            } kg`}
             growth="+8.2%"
           />
           <StatCard
@@ -163,13 +273,12 @@ const UserDashboard = () => {
       )}
 
       {/* Heatmap */}
-      <div className="bg-white p-4 rounded-xl shadow">
-       
-        <Heatmap data={heatmapData} />
+      <div className="mt-8">
+        <BadgeSection heatmapData={heatmapData} />
+        <div className="mt-6">
+          <Heatmap data={heatmapData} />
+        </div>
       </div>
-
-      {/* Progress */}
-      <WasteProgress />
     </div>
   );
 };

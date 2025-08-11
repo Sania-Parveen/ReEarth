@@ -7,6 +7,73 @@ import mongoose from 'mongoose';
 
 // POST /api/waste/log
 // controllers/wasteController.js
+// POST /api/waste/log
+// export const logWaste = async (req, res) => {
+//   try {
+//     const {
+//       userId,
+//       eventId,
+//       green = 0,
+//       blue = 0,
+//       black = 0,
+//     } = req.body;
+
+//     // Get current date in IST
+//     const now = new Date();
+//     const istOffset = 5.5 * 60 * 60 * 1000; // IST is UTC +5:30
+//     const istDate = new Date(now.getTime() + istOffset);
+
+//     // Save to WasteLog collection
+//     const wasteLog = new WasteLog({
+//       userId,
+//       eventId,
+//       greenWasteKg: green,
+//       blueWasteKg: blue,
+//       blackWasteKg: black,
+//       date: istDate,
+//     });
+
+//     await wasteLog.save();
+
+//     // ✅ Update the event's wasteTreated structure correctly
+//     const event = await Event.findById(eventId);
+//     if (!event) {
+//       return res.status(404).json({ error: "Event not found" });
+//     }
+
+//     let total = 0;
+
+//     const recordsToAdd = [];
+
+//     if (green > 0) {
+//       recordsToAdd.push({ userId, type: "green", kg: green });
+//       total += green;
+//     }
+//     if (blue > 0) {
+//       recordsToAdd.push({ userId, type: "blue", kg: blue });
+//       total += blue;
+//     }
+//     if (black > 0) {
+//       recordsToAdd.push({ userId, type: "black", kg: black });
+//       total += black;
+//     }
+
+//     event.wasteTreated.records.push(...recordsToAdd);
+//     event.wasteTreated.totalKg += total;
+
+//     await event.save();
+
+//     res.status(201).json({
+//       message: 'Waste logged and linked successfully',
+//       wasteLog,
+//     });
+//   } catch (error) {
+//     console.error('Error logging waste:', error);
+//     res.status(500).json({ error: 'Failed to log waste' });
+//   }
+// };
+
+
 export const logWaste = async (req, res) => {
   try {
     const {
@@ -17,11 +84,18 @@ export const logWaste = async (req, res) => {
       black = 0,
     } = req.body;
 
-    // Get current date in IST
+    // 🔒 Defensive check
+    if (!userId || !eventId) {
+      console.warn("🚨 Missing userId or eventId in request body:", req.body);
+      return res.status(400).json({ error: "Both userId and eventId are required" });
+    }
+
+    // Get IST time
     const now = new Date();
-    const istOffset = 5.5 * 60 * 60 * 1000; // IST is UTC +5:30
+    const istOffset = 5.5 * 60 * 60 * 1000;
     const istDate = new Date(now.getTime() + istOffset);
 
+    // Create and save WasteLog
     const wasteLog = new WasteLog({
       userId,
       eventId,
@@ -33,29 +107,42 @@ export const logWaste = async (req, res) => {
 
     await wasteLog.save();
 
-    // Update the event with the waste amounts
-    await Event.findByIdAndUpdate(
-      eventId,
-      {
-        $inc: {
-          'wasteTreated.green': green,
-          'wasteTreated.blue': blue,
-          'wasteTreated.black': black,
-        },
-      },
-      { new: true }
-    );
+    // Link to Event
+    const event = await Event.findById(eventId);
+    if (!event) {
+      return res.status(404).json({ error: "Event not found" });
+    }
+
+    let total = 0;
+    const recordsToAdd = [];
+
+    if (green > 0) {
+      recordsToAdd.push({ userId, type: "green", kg: green });
+      total += green;
+    }
+    if (blue > 0) {
+      recordsToAdd.push({ userId, type: "blue", kg: blue });
+      total += blue;
+    }
+    if (black > 0) {
+      recordsToAdd.push({ userId, type: "black", kg: black });
+      total += black;
+    }
+
+    event.wasteTreated.records.push(...recordsToAdd);
+    event.wasteTreated.totalKg += total;
+
+    await event.save();
 
     res.status(201).json({
       message: 'Waste logged and linked successfully',
       wasteLog,
     });
   } catch (error) {
-    console.error('Error logging waste:', error);
+    console.error('❌ Error logging waste:', error);
     res.status(500).json({ error: 'Failed to log waste' });
   }
 };
-
 
 
 
