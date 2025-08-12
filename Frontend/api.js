@@ -2,7 +2,8 @@
 import axios from "axios";
 
 // ✅ Base URL from .env or fallback
-const BASE_URL = import.meta.env.VITE_BACKEND_URL || "https://reearth-backend.onrender.com/";
+const BASE_URL = import.meta.env.VITE_BACKEND_URL || "https://reearth-backend.onrender.com";
+
 
 // ✅ All API Endpoints
 export const API = {
@@ -68,8 +69,17 @@ export const getBlogById = (id) => axios.get(API.GET_BLOG_BY_ID(id));
 export const deleteBlog = (id) => axios.delete(API.DELETE_BLOG(id));
 
 // --- Events ---
+// ✅ Create Event
+export const createEvent = async (eventData) => {
+  try {
+    const res = await axios.post(`${API.BASE_URL}/api/events/create`, eventData);
+    return res.data;
+  } catch (err) {
+    console.error("Error creating event:", err.response?.data || err.message);
+    throw err;
+  }
+};
 export const getEvents = () => axios.get(API.GET_EVENTS);
-export const createEvent = (eventData) => axios.post(API.CREATE_EVENT, eventData);
 export const getEventById = (eventId) => axios.get(API.GET_EVENT_BY_ID(eventId));
 export const joinEvent = (eventId, userId) =>
   axios.post(API.JOIN_EVENT(eventId), { userId });
