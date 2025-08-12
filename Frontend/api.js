@@ -2,7 +2,7 @@
 import axios from "axios";
 
 // ✅ Base URL from .env or fallback
-const BASE_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:3001";
+const BASE_URL = import.meta.env.VITE_BACKEND_URL || "https://reearth-backend.onrender.com/";
 
 // ✅ All API Endpoints
 export const API = {

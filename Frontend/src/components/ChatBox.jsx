@@ -1,42 +1,45 @@
-import React, { useState } from 'react';
-import axios from 'axios';
-import ReactMarkdown from 'react-markdown';
+import React, { useState } from "react";
+import axios from "axios";
+import ReactMarkdown from "react-markdown";
 
 function ChatBox() {
   const [messages, setMessages] = useState([
-    { from: 'bot', text: 'Hi! What type of waste do you want to recycle? ♻️' }
+    { from: "bot", text: "Hi! What type of waste do you want to recycle? ♻️" },
   ]);
-  const [input, setInput] = useState('');
+  const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
   const handleSend = async (e) => {
     e.preventDefault();
     if (!input.trim() || isLoading) return;
 
-    const userMessage = { from: 'user', text: input };
+    const userMessage = { from: "user", text: input };
     setMessages((prev) => [...prev, userMessage]);
-    setInput('');
+    setInput("");
     setIsLoading(true);
 
     try {
-      const res = await axios.post('http://localhost:3001/api/gemini/ask', {
-        prompt: `Answer in a structured, clear and readable Markdown format using bullet points, bold for section titles, and short paragraphs. Here's the question: ${input}`
-      });
+      const res = await axios.post(
+        `${import.meta.env.VITE_BACKEND_URL}/api/gemini/ask`,
+        {
+          prompt: `Answer in a structured, clear and readable Markdown format using bullet points, bold for section titles, and short paragraphs. Here's the question: ${input}`,
+        }
+      );
 
       const botMessage = {
-        from: 'bot',
-        text: res.data.reply
+        from: "bot",
+        text: res.data.reply,
       };
 
       setMessages((prev) => [...prev, botMessage]);
     } catch (err) {
-      console.error('Error fetching Gemini response:', err.message);
+      console.error("Error fetching Gemini response:", err.message);
       setMessages((prev) => [
         ...prev,
         {
-          from: 'bot',
-          text: "⚠️ Sorry, I'm having trouble responding right now."
-        }
+          from: "bot",
+          text: "⚠️ Sorry, I'm having trouble responding right now.",
+        },
       ]);
     }
 
@@ -47,17 +50,24 @@ function ChatBox() {
     <div className="flex flex-col h-full w-full">
       {/* Chat area */}
       <div className="flex-1 bg-gray-100 rounded-xl p-4 shadow-inner overflow-y-auto space-y-2">
-        <div className="text-center font-semibold text-green-600">🗣️ RecycleBot</div>
+        <div className="text-center font-semibold text-green-600">
+          🗣️ RecycleBot
+        </div>
         {messages.map((msg, idx) => (
-          <div key={idx} className={`flex ${msg.from === 'user' ? 'justify-end' : 'justify-start'}`}>
+          <div
+            key={idx}
+            className={`flex ${
+              msg.from === "user" ? "justify-end" : "justify-start"
+            }`}
+          >
             <div
               className={`px-4 py-2 text-sm rounded-lg shadow-sm max-w-2xl whitespace-pre-line ${
-                msg.from === 'user'
-                  ? 'bg-green-500 text-white'
-                  : 'bg-white text-gray-800 border border-gray-200'
+                msg.from === "user"
+                  ? "bg-green-500 text-white"
+                  : "bg-white text-gray-800 border border-gray-200"
               }`}
             >
-              {msg.from === 'bot' ? (
+              {msg.from === "bot" ? (
                 <div className="prose prose-sm prose-green">
                   <ReactMarkdown>{msg.text}</ReactMarkdown>
                 </div>
@@ -68,7 +78,9 @@ function ChatBox() {
           </div>
         ))}
         {isLoading && (
-          <div className="text-sm text-gray-500 animate-pulse">♻️ Typing...</div>
+          <div className="text-sm text-gray-500 animate-pulse">
+            ♻️ Typing...
+          </div>
         )}
       </div>
 

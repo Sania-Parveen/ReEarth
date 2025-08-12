@@ -17,12 +17,23 @@ export const createEvent = async (req, res) => {
     const { title, location, date,time, wasteType, volunteersNeeded, createdBy,description } = req.body;
 
     // Geocode the location to get lat/lng
-    const geoRes = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(location)}`);
+  const geoRes = await fetch(
+  `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(location)}`,
+  {
+    headers: {
+      "User-Agent": "YourAppName/1.0 (your-email@example.com)"
+    }
+  }
+);
+
+const geoData = await geoRes.json();
+
     const geoData = await geoRes.json();
 
     if (!geoData || geoData.length === 0) {
       return res.status(400).json({ error: 'Invalid location, coordinates not found' });
     }
+    
 
     const latitude = parseFloat(geoData[0].lat);
     const longitude = parseFloat(geoData[0].lon);
