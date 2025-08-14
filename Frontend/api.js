@@ -72,13 +72,17 @@ export const deleteBlog = (id) => axios.delete(API.DELETE_BLOG(id));
 // ✅ Create Event
 export const createEvent = async (eventData) => {
   try {
-    const res = await axios.post(`${API.BASE_URL}/api/events/create`, eventData);
+    const res = await axios.post(API.CREATE_EVENT, eventData);
     return res.data;
   } catch (err) {
     console.error("Error creating event:", err.response?.data || err.message);
+    if (err.response && typeof err.response.data === 'string') {
+      console.error("HTML/Error page returned:", err.response.data);
+    }
     throw err;
   }
 };
+
 export const getEvents = () => axios.get(API.GET_EVENTS);
 export const getEventById = (eventId) => axios.get(API.GET_EVENT_BY_ID(eventId));
 export const joinEvent = (eventId, userId) =>

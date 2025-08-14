@@ -11,29 +11,47 @@ dotenv.config();
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
+// Helper function to safely fetch coordinates from Nominatim API
+async function fetchCoordinates(location) {
+  const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(location)}`;
+  const headers = {
+    "User-Agent": "ReEarthApp/1.0 (sakshisood678@gmail.com)" // valid, reachable email
+  };
+
+  const response = await fetch(url, { headers });
+
+  const contentType = response.headers.get("content-type") || "";
+
+  // Check if status OK and content-type is JSON
+  if (!response.ok || !contentType.includes("application/json")) {
+    const text = await response.text(); // HTML or error
+    console.error(`Geocoding API error: HTTP ${response.status}`, text);
+    throw new Error(`Geocoding API error: HTTP ${response.status} - ${text.slice(0, 120)}`);
+  }
+
+  const data = await response.json();
+
+  if (!Array.isArray(data) || data.length === 0) {
+    throw new Error("No coordinates found for location");
+  }
+
+  return {
+    lat: parseFloat(data[0].lat),
+    lng: parseFloat(data[0].lon)
+  };
+}
+
+
 export const createEvent = async (req, res) => {
   try {
-    const { title, location, date,time, wasteType, volunteersNeeded, createdBy,description } = req.body;
+    const { title, location, date, time, wasteType, volunteersNeeded, createdBy, description } = req.body;
 
-    // Geocode the location to get lat/lng
-  const geoRes = await fetch(
-  `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(location)}`,
-  {
-    headers: {
-      "User-Agent": "YourAppName/1.0 (your-email@example.com)"
+    let coordinates;
+    try {
+      coordinates = await fetchCoordinates(location);
+    } catch (geoError) {
+      return res.status(400).json({ error: geoError.message });
     }
-  }
-);
-
-const geoData = await geoRes.json();
-
-    if (!geoData || geoData.length === 0) {
-      return res.status(400).json({ error: 'Invalid location, coordinates not found' });
-    }
-    
-
-    const latitude = parseFloat(geoData[0].lat);
-    const longitude = parseFloat(geoData[0].lon);
 
     const event = new Event({
       title,
@@ -46,19 +64,60 @@ const geoData = await geoRes.json();
       volunteersJoined: [],
       createdBy,
       eventId: nanoid(6),
-      coordinates: {
-        lat: latitude,
-        lng: longitude
-      }
+      coordinates
     });
 
     await event.save();
     res.status(201).json(event);
+
   } catch (err) {
-    console.error(err);
+    console.error('Create Event Error:', err);
     res.status(500).json({ error: 'Failed to create event' });
   }
 };
+
+export const updateEvent = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { title, description, location, date, time, wasteType, volunteersNeeded } = req.body;
+
+    const existingEvent = await Event.findById(id);
+    if (!existingEvent) {
+      return res.status(404).json({ message: "Event not found" });
+    }
+
+    let latitude = existingEvent.coordinates?.lat;
+    let longitude = existingEvent.coordinates?.lng;
+
+    if (location && location !== existingEvent.location) {
+      try {
+        const coordinates = await fetchCoordinates(location);
+        latitude = coordinates.lat;
+        longitude = coordinates.lng;
+      } catch (geoError) {
+        return res.status(400).json({ error: geoError.message });
+      }
+    }
+
+    existingEvent.title = title || existingEvent.title;
+    existingEvent.description = description || existingEvent.description;
+    existingEvent.location = location || existingEvent.location;
+    existingEvent.date = date || existingEvent.date;
+    existingEvent.time = time || existingEvent.time;
+    existingEvent.wasteType = wasteType || existingEvent.wasteType;
+    existingEvent.volunteersNeeded = volunteersNeeded || existingEvent.volunteersNeeded;
+    existingEvent.coordinates = { lat: latitude, lng: longitude };
+
+    const updatedEvent = await existingEvent.save();
+    res.json(updatedEvent);
+
+  } catch (error) {
+    console.error("Error updating event:", error);
+    res.status(500).json({ message: "Failed to update event", error });
+  }
+};
+
+
 
 export const joinEvent = async (req, res) => {
   const { eventId } = req.params;
@@ -103,61 +162,7 @@ export const getAllEvents = async (req, res) => {
 };
 
 // Update event
-export const updateEvent = async (req, res) => {
-  try {
-    const { id } = req.params;
-    const {
-      title,
-      description,
-      location,
-      date,
-      time,
-      wasteType,
-      volunteersNeeded
-    } = req.body;
 
-    const existingEvent = await Event.findById(id);
-    if (!existingEvent) {
-      return res.status(404).json({ message: "Event not found" });
-    }
-
-    let latitude = existingEvent.coordinates?.lat;
-    let longitude = existingEvent.coordinates?.lng;
-
-    // If location changed, fetch new coordinates
-    if (location && location !== existingEvent.location) {
-      const geoRes = await fetch(
-        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(location)}`,
-        { headers: { "User-Agent": "YourAppName/1.0 (your-email@example.com)" } }
-      );
-      const geoData = await geoRes.json();
-
-      if (!geoData || geoData.length === 0) {
-        return res.status(400).json({ error: "Invalid location, coordinates not found" });
-      }
-
-      latitude = parseFloat(geoData[0].lat);
-      longitude = parseFloat(geoData[0].lon);
-    }
-
-    // Update event fields
-    existingEvent.title = title || existingEvent.title;
-    existingEvent.description = description || existingEvent.description;
-    existingEvent.location = location || existingEvent.location;
-    existingEvent.date = date || existingEvent.date;
-    existingEvent.time = time || existingEvent.time;
-    existingEvent.wasteType = wasteType || existingEvent.wasteType;
-    existingEvent.volunteersNeeded = volunteersNeeded || existingEvent.volunteersNeeded;
-    existingEvent.coordinates = { lat: latitude, lng: longitude };
-
-    const updatedEvent = await existingEvent.save();
-    res.json(updatedEvent);
-
-  } catch (error) {
-    console.error("Error updating event:", error);
-    res.status(500).json({ message: "Failed to update event", error });
-  }
-};
 
 // Delete event
 export const deleteEvent = async (req, res) => {
